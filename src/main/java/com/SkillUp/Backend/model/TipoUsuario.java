@@ -1,4 +1,4 @@
-package com.SkillUp.Backend.Model;
+package com.SkillUp.Backend.model;
 
 public enum TipoUsuario {
     ADMIN_TUTOR,

@@ -1,6 +1,6 @@
-package com.SkillUp.Backend.Repository;
+package com.SkillUp.Backend.repository;
 
-import com.SkillUp.Backend.Model.Usuario;
+import com.SkillUp.Backend.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
