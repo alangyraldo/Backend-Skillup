@@ -1,4 +1,4 @@
-package com.SkillUp.Backend.Model;
+package com.SkillUp.Backend.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
