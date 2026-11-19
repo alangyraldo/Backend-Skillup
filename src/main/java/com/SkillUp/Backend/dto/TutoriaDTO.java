@@ -17,14 +17,13 @@ public class TutoriaDTO {
     private Integer cupos;
     private BigDecimal precio;
     private String modalidad;
-    private String estado;
 
     public TutoriaDTO() {
     }
 
     public TutoriaDTO(Long id, Long idPerfilTutor, Long idMateria, String titulo,
                       LocalDate fecha, LocalTime horaInicio, Integer duracionMinutos,
-                      Integer cupos, BigDecimal precio, String modalidad, String estado) {
+                      Integer cupos, BigDecimal precio, String modalidad) {
         this.id = id;
         this.idPerfilTutor = idPerfilTutor;
         this.idMateria = idMateria;
@@ -35,7 +34,6 @@ public class TutoriaDTO {
         this.cupos = cupos;
         this.precio = precio;
         this.modalidad = modalidad;
-        this.estado = estado;
     }
 
     public static TutoriaDTO fromEntity(Tutoria t) {
@@ -49,12 +47,10 @@ public class TutoriaDTO {
                 t.getDuracionMinutos(),
                 t.getCupos(),
                 t.getPrecio(),
-                t.getModalidad(),
-                t.getEstado()
+                t.getModalidad()
         );
     }
 
-    // El estado no se toma del DTO: lo maneja el service
     public Tutoria toEntity() {
         return new Tutoria(idPerfilTutor, idMateria, titulo, fecha, horaInicio,
                 duracionMinutos, cupos, precio, modalidad);
@@ -89,7 +85,4 @@ public class TutoriaDTO {
 
     public String getModalidad() { return modalidad; }
     public void setModalidad(String modalidad) { this.modalidad = modalidad; }
-
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; }
 }

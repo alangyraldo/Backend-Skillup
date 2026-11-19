@@ -41,7 +41,6 @@ public class TutoriaServiceJPA implements TutoriaService {
     @Transactional
     public Tutoria save(Tutoria tutoria) {
         validarTutoria(tutoria, 0L);
-        tutoria.setEstado("ACTIVA");
         return tutoriaRepository.save(tutoria);
     }
 
@@ -49,14 +48,7 @@ public class TutoriaServiceJPA implements TutoriaService {
     @Transactional
     public Tutoria update(Long id, Tutoria actualizada) {
         Tutoria existente = findById(id);
-
-        if (!"ACTIVA".equals(existente.getEstado())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "No se puede actualizar una tutoría " + existente.getEstado());
-        }
-
         validarTutoria(actualizada, id);
-
         existente.setIdPerfilTutor(actualizada.getIdPerfilTutor());
         existente.setIdMateria(actualizada.getIdMateria());
         existente.setTitulo(actualizada.getTitulo());
@@ -66,19 +58,6 @@ public class TutoriaServiceJPA implements TutoriaService {
         existente.setCupos(actualizada.getCupos());
         existente.setPrecio(actualizada.getPrecio());
         existente.setModalidad(actualizada.getModalidad());
-
-        return tutoriaRepository.save(existente);
-    }
-
-    @Override
-    @Transactional
-    public Tutoria cambiarEstado(Long id, String nuevoEstado) {
-        Tutoria existente = findById(id);
-        String nuevo = nuevoEstado == null ? "" : nuevoEstado.trim().toUpperCase();
-
-        validarTransicionEstado(existente.getEstado(), nuevo);
-
-        existente.setEstado(nuevo);
         return tutoriaRepository.save(existente);
     }
 
@@ -90,8 +69,6 @@ public class TutoriaServiceJPA implements TutoriaService {
         }
         tutoriaRepository.deleteById(id);
     }
-
-    // ---------- Reglas de negocio ----------
 
     private void validarTutoria(Tutoria t, Long excluirId) {
         if (t.getIdPerfilTutor() == null || t.getIdMateria() == null
@@ -106,29 +83,16 @@ public class TutoriaServiceJPA implements TutoriaService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "La duración y los cupos deben ser mayores a 0");
         }
-
         LocalTime fin = t.getHoraInicio().plusMinutes(t.getDuracionMinutos());
         if (!fin.isAfter(t.getHoraInicio())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "La tutoría debe terminar el mismo día (antes de medianoche)");
         }
-
         long choques = tutoriaRepository.contarChoques(
                 t.getIdPerfilTutor(), t.getFecha(), t.getHoraInicio(), fin, excluirId);
         if (choques > 0) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "El tutor ya tiene una tutoría en ese horario");
-        }
-    }
-
-    private void validarTransicionEstado(String actual, String nuevo) {
-        boolean permitida = switch (actual) {
-            case "ACTIVA" -> nuevo.equals("CANCELADA") || nuevo.equals("COMPLETADA");
-            default -> false;
-        };
-        if (!permitida) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "No se puede cambiar de '" + actual + "' a '" + nuevo + "'");
         }
     }
 }

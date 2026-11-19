@@ -40,10 +40,6 @@ public class Tutoria {
     @Column(nullable = false)
     private String modalidad;
 
-    // ACTIVA, CANCELADA o COMPLETADA
-    @Column(nullable = false)
-    private String estado;
-
     public Tutoria() {
     }
 
@@ -90,7 +86,4 @@ public class Tutoria {
 
     public String getModalidad() { return modalidad; }
     public void setModalidad(String modalidad) { this.modalidad = modalidad; }
-
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; }
 }

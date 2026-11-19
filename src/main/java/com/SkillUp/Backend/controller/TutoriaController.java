@@ -44,11 +44,6 @@ public class TutoriaController {
         return TutoriaDTO.fromEntity(tutoriaService.update(id, tutoriaDTO.toEntity()));
     }
 
-    @PutMapping("/{id}/estado")
-    public TutoriaDTO cambiarEstado(@PathVariable Long id, @RequestParam String estado) {
-        return TutoriaDTO.fromEntity(tutoriaService.cambiarEstado(id, estado));
-    }
-
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTutoria(@PathVariable Long id) {
