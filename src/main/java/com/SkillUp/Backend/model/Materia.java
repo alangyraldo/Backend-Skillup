@@ -18,6 +18,15 @@ public class Materia {
     private String descripcion;
 
 
+    public Materia() {
+    }
+
+    public Materia(String nombre, String descripcion) {
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+    }
+
+
     public Long getId() {
         return id;
     }
