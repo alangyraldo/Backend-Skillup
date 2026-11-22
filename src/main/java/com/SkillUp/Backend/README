@@ -1,0 +1,363 @@
+# SkillUp – Backend
+
+API REST del proyecto **SkillUp**, una plataforma de apoyo al aprendizaje que permite gestionar usuarios, tutores, materias, tutorías y recursos educativos.
+
+El backend está desarrollado con Java y Spring Boot, utilizando MySQL como sistema de gestión de base de datos.
+
+## 1. Tecnologías utilizadas
+
+- Java 21
+- Spring Boot
+- Gradle
+- Spring Web
+- Spring Data JPA
+- MySQL
+- Jakarta Validation
+- Lombok
+- Postman
+
+## 2. Requisitos previos
+
+Antes de ejecutar el proyecto, es necesario contar con:
+
+- JDK 21 o superior compatible con la versión del proyecto.
+- MySQL Server.
+- Git.
+- Un IDE compatible con Java, como IntelliJ IDEA o Visual Studio Code.
+- Postman para realizar pruebas de los endpoints.
+
+## 3. Clonar el repositorio
+
+Clona el repositorio desde GitHub:
+
+```bash
+git clone URL_DEL_REPOSITORIO
+```
+
+Ingresa a la carpeta del proyecto:
+
+```bash
+cd Backend-SkillUp
+```
+
+Reemplaza `URL_DEL_REPOSITORIO` por la dirección real del repositorio.
+
+## 4. Configuración de la base de datos
+
+El proyecto utiliza MySQL y una base de datos llamada `skillup_db`.
+
+### 4.1. Crear la base de datos
+
+Ejecuta el siguiente comando en MySQL:
+
+```sql
+CREATE DATABASE skillup_db;
+```
+
+Posteriormente, ejecuta el script SQL del proyecto para crear las tablas y cargar los datos iniciales, si están disponibles.
+
+**Importante:** La configuración de Hibernate utiliza `ddl-auto=none`, por lo tanto, las tablas deben existir previamente en MySQL. Hibernate no crea ni modifica automáticamente la estructura de la base de datos.
+
+### 4.2. Configuración de conexión
+
+El archivo de configuración se encuentra en:
+
+```text
+src/main/resources/application.properties
+```
+
+La configuración utilizada es:
+
+```properties
+spring.application.name=Backend
+server.port=8080
+
+spring.datasource.url=jdbc:mysql://localhost:3306/skillup_db?useSSL=false&serverTimezone=America/Bogota&allowPublicKeyRetrieval=true
+spring.datasource.username=${DB_USER}
+spring.datasource.password=${DB_PASSWORD}
+
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+```
+
+### 4.3. Variables de entorno
+
+Para conectarse a MySQL se deben configurar las siguientes variables de entorno:
+
+| Variable | Descripción |
+|---|---|
+| `DB_USER` | Usuario de conexión a MySQL. |
+| `DB_PASSWORD` | Contraseña del usuario de MySQL. |
+
+Ejemplo de configuración en macOS o Linux:
+
+```bash
+export DB_USER=usuario_mysql
+export DB_PASSWORD=contrasena_mysql
+```
+
+Ejemplo en Windows PowerShell:
+
+```powershell
+$env:DB_USER="usuario_mysql"
+$env:DB_PASSWORD="contrasena_mysql"
+```
+
+Los valores anteriores son ejemplos; cada integrante debe configurar sus propias credenciales según su instalación local.
+
+**Seguridad:** No almacenar contraseñas reales en el repositorio ni compartirlas mediante archivos versionados.
+
+## 5. Ejecutar el proyecto
+
+Desde la terminal, ubicada en la raíz del proyecto, ejecuta:
+
+### macOS o Linux
+
+```bash
+./gradlew bootRun
+```
+
+### Windows
+
+```bash
+gradlew.bat bootRun
+```
+
+Para compilar y verificar el proyecto:
+
+```bash
+./gradlew build
+```
+
+Si la aplicación inicia correctamente, el backend estará disponible en:
+
+```text
+http://localhost:8080
+```
+
+## 6. Estructura del proyecto
+
+El backend está organizado por responsabilidades:
+
+```text
+src/
+└── main/
+    ├── java/
+    │   └── com/SkillUp/Backend/
+    │       ├── config/
+    │       ├── controller/
+    │       ├── dto/
+    │       ├── exception/
+    │       ├── model/
+    │       ├── repository/
+    │       └── service/
+    │
+    └── resources/
+        └── application.properties
+```
+
+### Descripción de paquetes
+
+| Paquete | Responsabilidad |
+|---|---|
+| `config` | Configuraciones generales de la aplicación, como CORS. |
+| `controller` | Controladores y endpoints REST. |
+| `dto` | Objetos utilizados para recibir y responder información de la API. |
+| `exception` | Manejo global de excepciones. |
+| `model` | Entidades que representan las tablas de la base de datos. |
+| `repository` | Acceso y operaciones sobre la base de datos. |
+| `service` | Implementación de la lógica de negocio. |
+
+## 7. Endpoints de la API
+
+La API utiliza el prefijo `/api` para sus recursos.
+
+### 7.1. Autenticación y usuarios
+
+| Método | Endpoint | Descripción |
+|---|---|---|
+| POST | `/api/auth/registro` | Registrar usuario. |
+| POST | `/api/auth/login` | Iniciar sesión. |
+| GET | `/api/usuarios` | Listar usuarios. |
+| GET | `/api/usuarios/{id}` | Consultar usuario por ID. |
+| PUT | `/api/usuarios/{id}` | Actualizar usuario. |
+| DELETE | `/api/usuarios/{id}` | Eliminar usuario. |
+
+### 7.2. Tutores y materias
+
+| Método | Endpoint | Descripción |
+|---|---|---|
+| GET | `/api/tutores` | Listar tutores. |
+| POST | `/api/tutores` | Registrar tutor. |
+| GET | `/api/tutores/{id}` | Consultar tutor por ID. |
+| PUT | `/api/tutores/{id}` | Actualizar tutor. |
+| DELETE | `/api/tutores/{id}` | Eliminar tutor. |
+| GET | `/api/materias` | Listar materias. |
+| POST | `/api/materias` | Registrar materia. |
+| GET | `/api/materias/{id}` | Consultar materia por ID. |
+| PUT | `/api/materias/{id}` | Actualizar materia. |
+| DELETE | `/api/materias/{id}` | Eliminar materia. |
+
+### 7.3. Tutorías
+
+| Método | Endpoint | Descripción |
+|---|---|---|
+| GET | `/api/tutorias` | Listar tutorías. |
+| GET | `/api/tutorias?usuarioId={id}` | Consultar tutorías por usuario. |
+| GET | `/api/tutorias/{id}` | Consultar tutoría por ID. |
+| POST | `/api/tutorias` | Crear tutoría. |
+| PUT | `/api/tutorias/{id}` | Actualizar tutoría. |
+| PUT | `/api/tutorias/{id}/estado` | Actualizar estado de tutoría. |
+| DELETE | `/api/tutorias/{id}` | Eliminar tutoría. |
+
+### 7.4. Categorías de recursos
+
+| Método | Endpoint | Descripción |
+|---|---|---|
+| GET | `/api/categorias` | Listar categorías. |
+| GET | `/api/categorias/{id}` | Consultar categoría por ID. |
+| POST | `/api/categorias` | Crear categoría. |
+| PUT | `/api/categorias/{id}` | Actualizar categoría. |
+| DELETE | `/api/categorias/{id}` | Eliminar categoría. |
+
+### 7.5. Recursos de biblioteca
+
+| Método | Endpoint | Descripción |
+|---|---|---|
+| GET | `/api/recursos` | Listar recursos. |
+| GET | `/api/recursos?categoriaId={id}` | Filtrar recursos por categoría. |
+| GET | `/api/recursos/{id}` | Consultar recurso por ID. |
+| POST | `/api/recursos` | Crear recurso. |
+| PUT | `/api/recursos/{id}` | Actualizar recurso. |
+| DELETE | `/api/recursos/{id}` | Eliminar recurso. |
+
+### 7.6. Favoritos
+
+| Método | Endpoint | Descripción |
+|---|---|---|
+| POST | `/api/favoritos` | Agregar un recurso a favoritos. |
+| GET | `/api/favoritos/{idUsuario}` | Consultar favoritos de un usuario. |
+| DELETE | `/api/favoritos/{idUsuario}/{idRecurso}` | Eliminar un favorito. |
+
+## 8. Ejemplos de solicitudes
+
+Los siguientes ejemplos muestran cómo consumir algunos endpoints del módulo de recursos.
+
+### 8.1. Crear una categoría
+
+**Método:** POST
+
+**Endpoint:**
+
+```text
+http://localhost:8080/api/categorias
+```
+
+**Body (JSON):**
+
+```json
+{
+  "nombre": "Programación"
+}
+```
+
+### 8.2. Crear un recurso
+
+**Método:** POST
+
+**Endpoint:**
+
+```text
+http://localhost:8080/api/recursos
+```
+
+**Body (JSON):**
+
+```json
+{
+  "categoriaId": 1,
+  "titulo": "Introducción a Java",
+  "tipoRecurso": "VIDEO",
+  "urlArchivo": "https://ejemplo.com/java",
+  "descripcion": "Material introductorio de Java"
+}
+```
+
+### 8.3. Agregar un favorito
+
+**Método:** POST
+
+**Endpoint:**
+
+```text
+http://localhost:8080/api/favoritos
+```
+
+**Body (JSON):**
+
+```json
+{
+  "idUsuario": 1,
+  "idRecurso": 1
+}
+```
+
+Los identificadores enviados deben corresponder a registros existentes en la base de datos.
+
+## 9. Manejo de errores
+
+El backend cuenta con un manejador global de excepciones implementado mediante `@RestControllerAdvice`.
+
+Se contemplan los siguientes códigos de respuesta HTTP:
+
+| Código HTTP | Descripción |
+|---|---|
+| 200 | Solicitud procesada correctamente. |
+| 201 | Recurso creado correctamente. |
+| 204 | Operación realizada sin contenido de respuesta. |
+| 400 | Error de validación o solicitud incorrecta. |
+| 404 | Recurso no encontrado. |
+| 409 | Conflicto con un registro existente. |
+| 500 | Error interno del servidor. |
+
+Las respuestas de error pueden incluir fecha, código de estado, tipo de error y mensaje. En los errores de validación también se incluyen los detalles de los campos que presentan inconsistencias.
+
+## 10. Configuración CORS
+
+El backend cuenta con una configuración CORS para permitir solicitudes desde los orígenes autorizados del frontend.
+
+Se contemplan los entornos de desarrollo local mediante Live Server y el despliegue del frontend en GitHub Pages.
+
+Los orígenes permitidos se configuran en `CorsConfig.java` y deben coincidir con las direcciones reales utilizadas por el frontend.
+
+Para consumir el backend desde GitHub Pages, este debe estar disponible mediante una dirección pública accesible desde el navegador.
+
+## 11. Pruebas con Postman
+
+Postman se utiliza para validar los endpoints de la API.
+
+La colección de pruebas se organiza por módulos:
+
+- Categorías.
+- Recursos.
+- Favoritos.
+- Usuarios y autenticación.
+- Tutores y materias.
+- Tutorías.
+
+Las pruebas permiten verificar las operaciones de consulta, creación, actualización y eliminación, así como los escenarios de validación y manejo de errores.
+
+## 12. Seguridad y alcance de la entrega
+
+De acuerdo con las indicaciones del profesor para esta entrega, no se implementa JWT ni Spring Security.
+
+El backend contempla los endpoints de registro e inicio de sesión definidos para el proyecto, sin incorporar autenticación mediante tokens ni configuración de autorización con Spring Security.
+
+## 13. Equipo de desarrollo
+
+**Proyecto:** SkillUp
+**Tipo:** Proyecto académico – Desarrollo de backend.
+**Tecnologías principales:** Java, Spring Boot y MySQL.
+
+El desarrollo se realiza de manera colaborativa, mediante la implementación e integración de los módulos de usuarios, tutores, materias, tutorías y recursos educativos.
