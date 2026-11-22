@@ -31,9 +31,24 @@ public class Tutor {
 
     private String experiencia;
 
-    private String modalidad = "VIRTUAL"; // VIRTUAL, PRESENCIAL o AMBAS
+    private String modalidad = "VIRTUAL";
 
     private String foto;
+
+
+    public Tutor() {
+    }
+
+    public Tutor(Usuario usuario, Materia materia, String nivel, Integer precio,
+                 String experiencia, String modalidad, String foto) {
+        this.usuario = usuario;
+        this.materia = materia;
+        this.nivel = nivel;
+        this.precio = precio;
+        this.experiencia = experiencia;
+        this.modalidad = modalidad != null ? modalidad : "VIRTUAL";
+        this.foto = foto;
+    }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
