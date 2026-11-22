@@ -1,5 +1,7 @@
-
 package com.SkillUp.Backend.service;
+
+import com.SkillUp.Backend.dto.FavoritoRequest;
+import com.SkillUp.Backend.dto.FavoritoResponse;
 
 import com.SkillUp.Backend.model.Favorito;
 import com.SkillUp.Backend.model.FavoritoId;
@@ -34,9 +36,9 @@ public class FavoritoService {
         this.recursoRepository = recursoRepository;
     }
 
-    // Consultar favoritos de un usuario
+    // Listar favoritos de un usuario
     @Transactional(readOnly = true)
-    public List<Favorito> listarFavoritos(Long idUsuario) {
+    public List<FavoritoResponse> listarFavoritos(Long idUsuario) {
 
         if (!usuarioRepository.existsById(idUsuario)) {
             throw new ResponseStatusException(
@@ -45,26 +47,32 @@ public class FavoritoService {
             );
         }
 
-        return favoritoRepository.findById_IdUsuario(idUsuario);
+        return favoritoRepository.findById_IdUsuario(idUsuario)
+                .stream()
+                .map(this::convertirAResponse)
+                .toList();
     }
 
     // Agregar un recurso a favoritos
     @Transactional
-    public Favorito agregarFavorito(Long idUsuario, Long idRecurso) {
+    public FavoritoResponse agregarFavorito(FavoritoRequest request) {
 
-        Usuario usuario = usuarioRepository.findById(idUsuario)
+        Usuario usuario = usuarioRepository.findById(request.idUsuario())
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
-                        "Usuario no encontrado con ID: " + idUsuario
+                        "Usuario no encontrado con ID: " + request.idUsuario()
                 ));
 
-        RecursoBiblioteca recurso = recursoRepository.findById(idRecurso)
+        RecursoBiblioteca recurso = recursoRepository.findById(request.idRecurso())
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
-                        "Recurso no encontrado con ID: " + idRecurso
+                        "Recurso no encontrado con ID: " + request.idRecurso()
                 ));
 
-        FavoritoId favoritoId = new FavoritoId(idUsuario, idRecurso);
+        FavoritoId favoritoId = new FavoritoId(
+                request.idUsuario(),
+                request.idRecurso()
+        );
 
         if (favoritoRepository.existsById(favoritoId)) {
             throw new ResponseStatusException(
@@ -79,10 +87,12 @@ public class FavoritoService {
         favorito.setUsuario(usuario);
         favorito.setRecurso(recurso);
 
-        return favoritoRepository.save(favorito);
+        Favorito guardado = favoritoRepository.save(favorito);
+
+        return convertirAResponse(guardado);
     }
 
-    // Eliminar un recurso de favoritos
+    // Eliminar un favorito
     @Transactional
     public void eliminarFavorito(Long idUsuario, Long idRecurso) {
 
@@ -96,5 +106,16 @@ public class FavoritoService {
         }
 
         favoritoRepository.deleteById(favoritoId);
+    }
+
+    // Convertir entidad a DTO
+    private FavoritoResponse convertirAResponse(Favorito favorito) {
+
+        return new FavoritoResponse(
+                favorito.getUsuario().getId(),
+                favorito.getRecurso().getId(),
+                favorito.getRecurso().getTitulo(),
+                favorito.getFechaAgregado()
+        );
     }
 }

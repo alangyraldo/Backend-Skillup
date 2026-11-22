@@ -1,28 +1,20 @@
 package com.SkillUp.Backend.service;
 
-import com.SkillUp.Backend.model.CategoriaRecurso; //entidad que representa la tabla
-import com.SkillUp.Backend.repository.CategoriaRecursoRepository; //el repositorio que nos permite acceder a la tabla
-import org.springframework.http.HttpStatus; //codigos de estado HTTP como 200,404 o 500
-import org.springframework.stereotype.Service; //identifica la clase como componente de servicio de spring
-import org.springframework.transaction.annotation.Transactional;//gestiona transacciones con la BD
-import org.springframework.web.server.ResponseStatusException; //lanzar excepciones a un codigo HTTP
+import com.SkillUp.Backend.dto.CategoriaRecursoRequest;
+import com.SkillUp.Backend.dto.CategoriaRecursoResponse;
+import com.SkillUp.Backend.model.CategoriaRecurso;
+import com.SkillUp.Backend.repository.CategoriaRecursoRepository;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
 
-/*anotacion de spring que identifica la clase como un componente de la capa de servicios
-Spring detecta la clase cuando inicia la app y crea un objeto administrado por su contenedor (Spreng Bean)
-permitiendo inyectar CategoriaRecursoService en otras clases ej, en nuestro controller
-* */
 @Service
 public class CategoriaRecursoService {
-    /*inyectamos dependencias y el constructor
-    * declaramos una variable que representa nuestro repositorio
-    * final: este objeto es inmutable, se crean copias delobjeto pero su clase no es inmutable,
-    * su referencia debe asignarse una sola vez, lo usamos porque queremos que el repositorio se asigne al contruir el objeto
-    * y que posteriormente no podamos reemplazar su referencia por otro repositorio
-    * CategoriaRecursoRepository, es el tipo de variable y categoriaRepository es el nombre que utilizamos para acceder al repositorio
-    * el constructor recibe una instancia de CategoriaRecursoRepository, Spring se encraga de proporcionarla automaticamente mediante
-    * inyeccion de dependencias
-    * */
+
     private final CategoriaRecursoRepository categoriaRepository;
 
     public CategoriaRecursoService(
@@ -30,18 +22,66 @@ public class CategoriaRecursoService {
         this.categoriaRepository = categoriaRepository;
     }
 
-    /*metodo que permite consultar todas las categorias registradas
-    *@Transactional
-    *
-    * */
+    // Listar categorías
     @Transactional(readOnly = true)
-    public List<CategoriaRecurso> listarCategorias() {
-        return categoriaRepository.findAll();
+    public List<CategoriaRecursoResponse> listarCategorias() {
+
+        return categoriaRepository.findAll()
+                .stream()
+                .map(this::convertirAResponse)
+                .toList();
     }
 
-    // Consultar una categoría por su ID
+    // Consultar categoría
     @Transactional(readOnly = true)
-    public CategoriaRecurso obtenerCategoria(Long id) {
+    public CategoriaRecursoResponse obtenerCategoria(Long id) {
+
+        CategoriaRecurso categoria = buscarCategoria(id);
+
+        return convertirAResponse(categoria);
+    }
+
+    // Crear categoría
+    @Transactional
+    public CategoriaRecursoResponse crearCategoria(
+            CategoriaRecursoRequest request) {
+
+        CategoriaRecurso categoria = new CategoriaRecurso();
+
+        categoria.setNombre(request.getNombre());
+
+        CategoriaRecurso guardada = categoriaRepository.save(categoria);
+
+        return convertirAResponse(guardada);
+    }
+
+    // Actualizar categoría
+    @Transactional
+    public CategoriaRecursoResponse actualizarCategoria(
+            Long id,
+            CategoriaRecursoRequest request) {
+
+        CategoriaRecurso categoria = buscarCategoria(id);
+
+        categoria.setNombre(request.getNombre());
+
+        CategoriaRecurso actualizada = categoriaRepository.save(categoria);
+
+        return convertirAResponse(actualizada);
+    }
+
+    // Eliminar categoría
+    @Transactional
+    public void eliminarCategoria(Long id) {
+
+        CategoriaRecurso categoria = buscarCategoria(id);
+
+        categoriaRepository.delete(categoria);
+    }
+
+    // Buscar categoría por ID
+    private CategoriaRecurso buscarCategoria(Long id) {
+
         return categoriaRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
@@ -49,31 +89,13 @@ public class CategoriaRecursoService {
                 ));
     }
 
-    // Crear una categoría
-    @Transactional
-    public CategoriaRecurso crearCategoria(CategoriaRecurso categoria) {
-        return categoriaRepository.save(categoria);
-    }
+    // Convertir entidad a DTO
+    private CategoriaRecursoResponse convertirAResponse(
+            CategoriaRecurso categoria) {
 
-    // Actualizar una categoría
-    @Transactional
-    public CategoriaRecurso actualizarCategoria(
-            Long id,
-            CategoriaRecurso datosCategoria) {
-
-        CategoriaRecurso categoria = obtenerCategoria(id);
-
-        categoria.setNombre(datosCategoria.getNombre());
-
-        return categoriaRepository.save(categoria);
-    }
-
-    // Eliminar una categoría
-    @Transactional
-    public void eliminarCategoria(Long id) {
-
-        CategoriaRecurso categoria = obtenerCategoria(id);
-
-        categoriaRepository.delete(categoria);
+        return new CategoriaRecursoResponse(
+                categoria.getId(),
+                categoria.getNombre()
+        );
     }
 }

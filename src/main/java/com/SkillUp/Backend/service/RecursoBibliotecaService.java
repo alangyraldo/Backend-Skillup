@@ -1,7 +1,11 @@
 package com.SkillUp.Backend.service;
 
+import com.SkillUp.Backend.dto.RecursoRequest;
+import com.SkillUp.Backend.dto.RecursoResponse;
+
 import com.SkillUp.Backend.model.CategoriaRecurso;
 import com.SkillUp.Backend.model.RecursoBiblioteca;
+
 import com.SkillUp.Backend.repository.CategoriaRecursoRepository;
 import com.SkillUp.Backend.repository.RecursoBibliotecaRepository;
 
@@ -28,24 +32,26 @@ public class RecursoBibliotecaService {
 
     // Listar todos los recursos
     @Transactional(readOnly = true)
-    public List<RecursoBiblioteca> listarRecursos() {
-        return recursoRepository.findAll();
+    public List<RecursoResponse> listarRecursos() {
+
+        return recursoRepository.findAll()
+                .stream()
+                .map(this::convertirAResponse)
+                .toList();
     }
 
-    // Consultar un recurso por ID
+    // Consultar recurso por ID
     @Transactional(readOnly = true)
-    public RecursoBiblioteca obtenerRecurso(Long id) {
+    public RecursoResponse obtenerRecurso(Long id) {
 
-        return recursoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Recurso no encontrado con ID: " + id
-                ));
+        RecursoBiblioteca recurso = buscarRecurso(id);
+
+        return convertirAResponse(recurso);
     }
 
     // Consultar recursos por categoría
     @Transactional(readOnly = true)
-    public List<RecursoBiblioteca> listarPorCategoria(Long idCategoria) {
+    public List<RecursoResponse> listarPorCategoria(Long idCategoria) {
 
         if (!categoriaRepository.existsById(idCategoria)) {
             throw new ResponseStatusException(
@@ -54,58 +60,81 @@ public class RecursoBibliotecaService {
             );
         }
 
-        return recursoRepository.findByCategoria_Id(idCategoria);
+        return recursoRepository.findByCategoria_Id(idCategoria)
+                .stream()
+                .map(this::convertirAResponse)
+                .toList();
     }
 
-    // Crear un recurso
+    // Crear recurso
     @Transactional
-    public RecursoBiblioteca crearRecurso(RecursoBiblioteca recurso) {
+    public RecursoResponse crearRecurso(RecursoRequest request) {
 
-        validarRecurso(recurso);
+        validarRecurso(request);
 
-        CategoriaRecurso categoria = obtenerCategoria(
-                recurso.getCategoria().getId()
+        CategoriaRecurso categoria = buscarCategoria(
+                request.getCategoriaId()
         );
 
-        recurso.setCategoria(categoria);
+        RecursoBiblioteca recurso = new RecursoBiblioteca();
 
-        return recursoRepository.save(recurso);
+        recurso.setCategoria(categoria);
+        recurso.setTitulo(request.getTitulo());
+        recurso.setTipoRecurso(request.getTipoRecurso());
+        recurso.setUrlArchivo(request.getUrlArchivo());
+        recurso.setDescripcion(request.getDescripcion());
+
+        RecursoBiblioteca guardado = recursoRepository.save(recurso);
+
+        return convertirAResponse(guardado);
     }
 
-    // Actualizar un recurso
+    // Actualizar recurso
     @Transactional
-    public RecursoBiblioteca actualizarRecurso(
+    public RecursoResponse actualizarRecurso(
             Long id,
-            RecursoBiblioteca datosRecurso) {
+            RecursoRequest request) {
 
-        validarRecurso(datosRecurso);
+        validarRecurso(request);
 
-        RecursoBiblioteca recurso = obtenerRecurso(id);
+        RecursoBiblioteca recurso = buscarRecurso(id);
 
-        CategoriaRecurso categoria = obtenerCategoria(
-                datosRecurso.getCategoria().getId()
+        CategoriaRecurso categoria = buscarCategoria(
+                request.getCategoriaId()
         );
 
         recurso.setCategoria(categoria);
-        recurso.setTitulo(datosRecurso.getTitulo());
-        recurso.setTipoRecurso(datosRecurso.getTipoRecurso());
-        recurso.setUrlArchivo(datosRecurso.getUrlArchivo());
-        recurso.setDescripcion(datosRecurso.getDescripcion());
+        recurso.setTitulo(request.getTitulo());
+        recurso.setTipoRecurso(request.getTipoRecurso());
+        recurso.setUrlArchivo(request.getUrlArchivo());
+        recurso.setDescripcion(request.getDescripcion());
 
-        return recursoRepository.save(recurso);
+        RecursoBiblioteca actualizado = recursoRepository.save(recurso);
+
+        return convertirAResponse(actualizado);
     }
 
-    // Eliminar un recurso
+    // Eliminar recurso
     @Transactional
     public void eliminarRecurso(Long id) {
 
-        RecursoBiblioteca recurso = obtenerRecurso(id);
+        RecursoBiblioteca recurso = buscarRecurso(id);
 
         recursoRepository.delete(recurso);
     }
 
-    // Buscar una categoría existente
-    private CategoriaRecurso obtenerCategoria(Long idCategoria) {
+    // Buscar recurso
+    private RecursoBiblioteca buscarRecurso(Long id) {
+
+        return recursoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Recurso no encontrado con ID: " + id
+                ));
+    }
+
+    // Buscar categoría
+    private CategoriaRecurso buscarCategoria(Long idCategoria) {
 
         return categoriaRepository.findById(idCategoria)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -114,41 +143,29 @@ public class RecursoBibliotecaService {
                 ));
     }
 
-    // Validar los datos del recurso
-    private void validarRecurso(RecursoBiblioteca recurso) {
+    // Validar datos recibidos
+    private void validarRecurso(RecursoRequest request) {
 
-        if (recurso == null) {
+        if (request == null) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Los datos del recurso son obligatorios"
             );
         }
+    }
 
-        if (recurso.getTitulo() == null ||
-                recurso.getTitulo().isBlank()) {
+    // Convertir entidad a DTO
+    private RecursoResponse convertirAResponse(
+            RecursoBiblioteca recurso) {
 
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "El título del recurso es obligatorio"
-            );
-        }
-
-        if (recurso.getTipoRecurso() == null ||
-                recurso.getTipoRecurso().isBlank()) {
-
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "El tipo de recurso es obligatorio"
-            );
-        }
-
-        if (recurso.getCategoria() == null ||
-                recurso.getCategoria().getId() == null) {
-
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Debe seleccionar una categoría"
-            );
-        }
+        return new RecursoResponse(
+                recurso.getId(),
+                recurso.getCategoria().getId(),
+                recurso.getCategoria().getNombre(),
+                recurso.getTitulo(),
+                recurso.getTipoRecurso(),
+                recurso.getUrlArchivo(),
+                recurso.getDescripcion()
+        );
     }
 }
