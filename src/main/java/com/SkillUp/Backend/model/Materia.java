@@ -15,16 +15,18 @@ public class Materia {
     @Column(nullable = false, unique = true)
     private String nombre;
 
-    private String descripcion;
+    private String area;
+
 
 
     public Materia() {
     }
 
-    public Materia(String nombre, String descripcion) {
+    public Materia(String nombre, String area) {
         this.nombre = nombre;
-        this.descripcion = descripcion;
+        this.area = area;
     }
+
 
 
     public Long getId() {
@@ -43,11 +45,11 @@ public class Materia {
         this.nombre = nombre;
     }
 
-    public String getDescripcion() {
-        return descripcion;
+    public String getArea() {
+        return area;
     }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    public void setArea(String area) {
+        this.area = area;
     }
 }
