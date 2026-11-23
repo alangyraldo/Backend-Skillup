@@ -4,7 +4,7 @@ import com.SkillUp.Backend.model.TipoUsuario;
 import com.SkillUp.Backend.model.Usuario;
 
 public record UsuarioResponse(
-        Integer id,
+        Long id,
         String nombre,
         String apellido,
         String email,

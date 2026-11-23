@@ -72,7 +72,7 @@ public class TutorService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "La materia indicada no existe"));
     }
 
-    private Usuario buscarUsuario(Integer usuarioId) {
+    private Usuario buscarUsuario(Long usuarioId) {
         if (usuarioId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debes indicar el id del usuario");
         }

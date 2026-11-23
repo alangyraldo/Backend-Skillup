@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface TutorRepository extends JpaRepository<Tutor, Long> {
     boolean existsByMateriaId(Long materiaId);
-    boolean existsByUsuarioId(Integer usuarioId);
+    boolean existsByUsuarioId(Long usuarioId);
 
     @Query("""
         SELECT t FROM Tutor t

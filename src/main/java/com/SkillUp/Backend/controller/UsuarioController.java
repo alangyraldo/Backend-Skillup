@@ -25,14 +25,14 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UsuarioResponse> obtener(@PathVariable Integer id) {
+    public ResponseEntity<UsuarioResponse> obtener(@PathVariable Long id) {
         return repo.findById(id)
                 .map(u -> ResponseEntity.ok(UsuarioResponse.desde(u)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UsuarioResponse> actualizar(@PathVariable Integer id,
+    public ResponseEntity<UsuarioResponse> actualizar(@PathVariable Long id,
                                                       @Valid @RequestBody ActualizarUsuarioRequest req) {
         return repo.findById(id).map(u -> {
             u.setNombre(req.nombre());
@@ -43,7 +43,7 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         if (!repo.existsById(id)) return ResponseEntity.notFound().build();
         repo.deleteById(id);
         return ResponseEntity.noContent().build();
