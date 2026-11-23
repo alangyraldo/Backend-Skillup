@@ -44,7 +44,7 @@ public class MateriaService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya existe una materia con ese nombre");
         }
         materia.setNombre(datos.getNombre());
-        materia.setDescripcion(datos.getDescripcion());
+        materia.setArea(datos.getArea());
         return materiaRepository.save(materia);
     }
 

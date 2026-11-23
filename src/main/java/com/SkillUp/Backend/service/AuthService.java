@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import com.SkillUp.Backend.security.JwtService;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +18,7 @@ public class AuthService {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     public UsuarioResponse registrar(RegistroRequest request) {
         if (usuarioRepository.existsByEmail(request.email())) {
@@ -42,6 +44,8 @@ public class AuthService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenciales incorrectas");
         }
 
-        return UsuarioResponse.desde(usuario);
+        // return UsuarioResponse.desde(usuario); se cambia est aliena
+        String token = jwtService.generateToken(usuario.getEmail(), usuario.getTipoUsuario().name());
+        return UsuarioResponse.desde(usuario, token);
     }
 }
