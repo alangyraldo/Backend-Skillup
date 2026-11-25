@@ -21,6 +21,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> manejarResponseStatus(
             ResponseStatusException ex) {
 
+        ex.printStackTrace();
+
         Map<String, Object> respuesta = new HashMap<>();
 
         respuesta.put("fecha", LocalDateTime.now());

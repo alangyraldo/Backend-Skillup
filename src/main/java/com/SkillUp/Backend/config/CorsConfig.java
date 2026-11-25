@@ -17,6 +17,7 @@ public class CorsConfig implements WebMvcConfigurer {
                         "http://127.0.0.1:5500",
                         "https://alangyraldo.github.io"
                 )
+                .allowedOriginPatterns("*")
 
                 .allowedMethods(
                         "GET",
