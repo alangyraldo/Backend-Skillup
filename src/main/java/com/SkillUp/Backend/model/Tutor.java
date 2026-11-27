@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Positive;
 
 @Entity
 @Table(name = "perfil_tutor")
-public class Tutor {
+public class  Tutor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
