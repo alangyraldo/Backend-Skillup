@@ -42,6 +42,9 @@ public class UsuarioController {
             u.setNombre(req.nombre());
             u.setApellido(req.apellido());
             u.setTelefono(req.telefono());
+            if (req.foto() != null) {
+                u.setFoto(req.foto().isBlank() ? null : req.foto());
+            }
             return ResponseEntity.ok(UsuarioResponse.desde(repo.save(u)));
         }).orElse(ResponseEntity.notFound().build());
     }
@@ -86,6 +89,9 @@ public class UsuarioController {
             u.setNombre(req.nombre());
             u.setApellido(req.apellido());
             u.setTelefono(req.telefono());
+            if (req.foto() != null) {
+                u.setFoto(req.foto().isBlank() ? null : req.foto());
+            }
 
             if (req.email() != null && !req.email().isBlank()) {
                 String nuevoEmail = req.email().trim().toLowerCase();

@@ -1,6 +1,5 @@
--- CREATE DATABASE IF NOT EXIST skillup_db;
--- USE skillup_db;
-
+CREATE DATABASE IF NOT EXISTS skillup_db;
+USE skillup_db;
 
 CREATE TABLE usuario (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -10,6 +9,8 @@ CREATE TABLE usuario (
     tipo_usuario ENUM('ADMIN_TUTOR', 'ESTUDIANTE') NOT NULL,
     contrasena VARCHAR(255) NOT NULL,
     telefono VARCHAR(20),
+    foto MEDIUMBLOB,
+    foto_tipo VARCHAR(50),
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -24,7 +25,6 @@ CREATE TABLE categoria_recurso (
     nombre VARCHAR(100) NOT NULL
 );
 
-
 CREATE TABLE perfil_tutor (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT UNIQUE NOT NULL,
@@ -33,7 +33,8 @@ CREATE TABLE perfil_tutor (
     precio_base DECIMAL(10, 0),
     experiencia VARCHAR(100),
     modalidad ENUM('VIRTUAL', 'PRESENCIAL', 'AMBAS') DEFAULT 'VIRTUAL',
-    foto VARCHAR(255),
+    foto MEDIUMBLOB,
+    foto_tipo VARCHAR(50),
     FOREIGN KEY (id_usuario) REFERENCES usuario(id) ON DELETE CASCADE,
     FOREIGN KEY (id_materia) REFERENCES materia(id) ON DELETE RESTRICT
 );
@@ -47,7 +48,6 @@ CREATE TABLE recurso_biblioteca (
     descripcion TEXT,
     FOREIGN KEY (id_categoria) REFERENCES categoria_recurso(id) ON DELETE CASCADE
 );
-
 
 CREATE TABLE horario_tutor (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -70,10 +70,11 @@ CREATE TABLE tutorias (
     cupos INT NOT NULL DEFAULT 1,
     precio DECIMAL(10, 0) NOT NULL,
     modalidad ENUM('VIRTUAL', 'PRESENCIAL') NOT NULL,
+    foto MEDIUMBLOB,
+    foto_tipo VARCHAR(50),
     FOREIGN KEY (id_perfil_tutor) REFERENCES perfil_tutor(id) ON DELETE CASCADE,
     FOREIGN KEY (id_materia) REFERENCES materia(id) ON DELETE RESTRICT
 );
-
 
 CREATE TABLE reserva (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -101,14 +102,12 @@ INSERT INTO usuario (nombre, apellido, email, tipo_usuario, contrasena, telefono
 ('Luis', 'Martínez', 'luis.martinez@email.com', 'ESTUDIANTE', 'hashed_pass_4', '3004561230', '2026-03-05 16:45:00'),
 ('Elena', 'Torres', 'elena.torres@email.com', 'ESTUDIANTE', 'hashed_pass_5', '3007894561', '2026-03-12 11:00:00');
 
-
 INSERT INTO materia (nombre, area) VALUES
 ('Matemáticas Discretas', 'Ciencias Exactas'),
 ('Programación Orientada a Objetos', 'Tecnología'),
 ('Bases de Datos I', 'Tecnología'),
 ('Física Mecánica', 'Ciencias Exactas'),
 ('Inglés Técnico', 'Idiomas');
-
 
 INSERT INTO categoria_recurso (nombre) VALUES
 ('Ebooks y Guías'),
@@ -117,12 +116,11 @@ INSERT INTO categoria_recurso (nombre) VALUES
 ('Presentaciones y Diapositivas'),
 ('Plantillas y Código Base');
 
-
-INSERT INTO perfil_tutor (id_usuario, id_materia, nivel, precio_base, experiencia, modalidad, foto) VALUES
-(1, 2, 'Avanzado', 50000, '3 años enseñando programación', 'VIRTUAL', 'foto_ana.jpg'),
-(2, 1, 'Intermedio', 40000, '2 años de experiencia en matemáticas', 'AMBAS', 'foto_carlos.jpg'),
-(3, 3, 'Avanzado', 55000, '4 años como DBA y docente', 'VIRTUAL', 'foto_sofia.jpg');
-
+-- Las imágenes reales se cargan desde la aplicación; no se insertan nombres de archivo como si fueran BLOB.
+INSERT INTO perfil_tutor (id_usuario, id_materia, nivel, precio_base, experiencia, modalidad) VALUES
+(1, 2, 'Avanzado', 50000, '3 años enseñando programación', 'VIRTUAL'),
+(2, 1, 'Intermedio', 40000, '2 años de experiencia en matemáticas', 'AMBAS'),
+(3, 3, 'Avanzado', 55000, '4 años como DBA y docente', 'VIRTUAL');
 
 INSERT INTO recurso_biblioteca (id_categoria, titulo, tipo_recurso, url_archivo, descripcion) VALUES
 (1, 'Guía definitiva de POO', 'PDF', 'https://recursos.com/poo-guia', 'Manual completo sobre pilares de la programación orientada a objetos.'),
@@ -131,7 +129,6 @@ INSERT INTO recurso_biblioteca (id_categoria, titulo, tipo_recurso, url_archivo,
 (3, 'El futuro de la IA en la educación', 'ARTICULO', 'https://recursos.com/ia-educacion', 'Artículo académico sobre tendencias tecnológicas.'),
 (5, 'Plantilla SQL para Proyectos', 'ZIP', 'https://recursos.com/sql-template', 'Esquema base listo para importar en MySQL Workbench.');
 
-
 INSERT INTO horario_tutor (id_perfil_tutor, dia_semana, hora_inicio, cupos, activo) VALUES
 (1, 'LUNES', '10:00:00', 5, 1),
 (1, 'MIERCOLES', '14:00:00', 5, 1),
@@ -139,14 +136,12 @@ INSERT INTO horario_tutor (id_perfil_tutor, dia_semana, hora_inicio, cupos, acti
 (2, 'JUEVES', '09:00:00', 10, 1),
 (3, 'VIERNES', '15:00:00', 6, 1);
 
-
 INSERT INTO tutorias (id_perfil_tutor, id_materia, titulo, fecha, hora_inicio, duracion_minutos, cupos, precio, modalidad) VALUES
 (1, 2, 'Dominando Clases y Objetos en Java', '2026-11-20', '10:00:00', 60, 5, 50000, 'VIRTUAL'),
 (2, 1, 'Lógica Proposicional desde Cero', '2026-11-21', '09:00:00', 90, 10, 40000, 'PRESENCIAL'),
 (3, 3, 'Normalización y Modelado ER', '2026-11-22', '15:00:00', 60, 6, 55000, 'VIRTUAL'),
 (1, 2, 'Estructuras de Datos con Listas', '2026-11-23', '11:00:00', 60, 5, 50000, 'VIRTUAL'),
 (2, 1, 'Teoría de Conjuntos Aplicada', '2026-11-24', '16:00:00', 60, 8, 40000, 'PRESENCIAL');
-
 
 INSERT INTO reserva (id_usuario, id_tutoria, estado) VALUES
 (4, 1, 'CONFIRMADA'),
@@ -156,18 +151,8 @@ INSERT INTO reserva (id_usuario, id_tutoria, estado) VALUES
 (4, 5, 'CONFIRMADA');
 
 INSERT INTO favorito (id_usuario, id_recurso) VALUES
-(4, 1),
-(4, 3),
-(5, 2),
-(5, 1),
-(5, 5);
+(4, 1), (4, 3), (5, 2), (5, 1), (5, 5);
 
-SELECT * FROM usuario;
-SELECT * FROM materia;
-SELECT * FROM categoria_recurso;
-SELECT * FROM perfil_tutor;
-SELECT * FROM recurso_biblioteca;
-SELECT * FROM horario_tutor;
-SELECT * FROM tutorias;
-SELECT * FROM reserva;
-SELECT * FROM favorito;
+SELECT id, nombre, apellido, foto IS NOT NULL AS tiene_foto FROM usuario;
+SELECT id, id_usuario, foto IS NOT NULL AS tiene_foto FROM perfil_tutor;
+SELECT id, titulo, foto IS NOT NULL AS tiene_foto FROM tutorias;

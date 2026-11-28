@@ -1,6 +1,8 @@
 package com.SkillUp.Backend.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.SkillUp.Backend.util.FotoUtils;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -39,6 +41,15 @@ public class Tutoria {
 
     @Column(nullable = false)
     private String modalidad;
+
+    @JsonIgnore
+    @Lob
+    @Column(name = "foto", columnDefinition = "MEDIUMBLOB")
+    private byte[] fotoBytes;
+
+    @JsonIgnore
+    @Column(name = "foto_tipo", length = 50)
+    private String fotoTipo;
 
     public Tutoria() {
     }
@@ -86,4 +97,11 @@ public class Tutoria {
 
     public String getModalidad() { return modalidad; }
     public void setModalidad(String modalidad) { this.modalidad = modalidad; }
+
+    public String getFoto() { return FotoUtils.aDataUrl(fotoBytes, fotoTipo); }
+    public void setFoto(String dataUrl) {
+        FotoUtils.Foto foto = FotoUtils.desdeDataUrl(dataUrl);
+        this.fotoBytes = foto == null ? null : foto.bytes();
+        this.fotoTipo = foto == null ? null : foto.contentType();
+    }
 }

@@ -58,6 +58,9 @@ public class TutoriaServiceJPA implements TutoriaService {
         existente.setCupos(actualizada.getCupos());
         existente.setPrecio(actualizada.getPrecio());
         existente.setModalidad(actualizada.getModalidad());
+        if (actualizada.getFoto() != null) {
+            existente.setFoto(actualizada.getFoto());
+        }
         return tutoriaRepository.save(existente);
     }
 

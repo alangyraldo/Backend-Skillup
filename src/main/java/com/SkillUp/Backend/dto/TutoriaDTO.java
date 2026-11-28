@@ -17,13 +17,14 @@ public class TutoriaDTO {
     private Integer cupos;
     private BigDecimal precio;
     private String modalidad;
+    private String foto;
 
     public TutoriaDTO() {
     }
 
     public TutoriaDTO(Long id, Long idPerfilTutor, Long idMateria, String titulo,
                       LocalDate fecha, LocalTime horaInicio, Integer duracionMinutos,
-                      Integer cupos, BigDecimal precio, String modalidad) {
+                      Integer cupos, BigDecimal precio, String modalidad, String foto) {
         this.id = id;
         this.idPerfilTutor = idPerfilTutor;
         this.idMateria = idMateria;
@@ -34,6 +35,7 @@ public class TutoriaDTO {
         this.cupos = cupos;
         this.precio = precio;
         this.modalidad = modalidad;
+        this.foto = foto;
     }
 
     public static TutoriaDTO fromEntity(Tutoria t) {
@@ -47,13 +49,16 @@ public class TutoriaDTO {
                 t.getDuracionMinutos(),
                 t.getCupos(),
                 t.getPrecio(),
-                t.getModalidad()
+                t.getModalidad(),
+                t.getFoto()
         );
     }
 
     public Tutoria toEntity() {
-        return new Tutoria(idPerfilTutor, idMateria, titulo, fecha, horaInicio,
+        Tutoria tutoria = new Tutoria(idPerfilTutor, idMateria, titulo, fecha, horaInicio,
                 duracionMinutos, cupos, precio, modalidad);
+        tutoria.setFoto(foto);
+        return tutoria;
     }
 
     public Long getId() { return id; }
@@ -85,4 +90,6 @@ public class TutoriaDTO {
 
     public String getModalidad() { return modalidad; }
     public void setModalidad(String modalidad) { this.modalidad = modalidad; }
+    public String getFoto() { return foto; }
+    public void setFoto(String foto) { this.foto = foto; }
 }

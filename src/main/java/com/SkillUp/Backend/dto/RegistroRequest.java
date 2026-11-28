@@ -12,5 +12,6 @@ public record RegistroRequest(
         @NotBlank @Email @Size(max = 100) String email,
         @NotBlank @Size(min = 6, max = 100) String contrasena,
         @NotNull TipoUsuario tipoUsuario,
-        @Size(max = 20) String telefono
+        @Size(max = 20) String telefono,
+        String foto
 ) {}

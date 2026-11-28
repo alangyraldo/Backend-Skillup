@@ -18,5 +18,6 @@ public record ActualizarUsuarioRequest(
         String telefono,
         @Email(message = "Correo inválido") String email,
         String contrasenaActual,
-        String contrasenaNueva
+        String contrasenaNueva,
+        String foto
 ) {}

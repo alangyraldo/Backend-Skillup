@@ -55,7 +55,9 @@ public class TutorService {
         tutor.setModalidad(datos.getModalidad());
         tutor.setPrecio(datos.getPrecio());
         tutor.setExperiencia(datos.getExperiencia());
-        tutor.setFoto(datos.getFoto());
+        if (datos.getFoto() != null) {
+            tutor.setFoto(datos.getFoto());
+        }
         tutor.setMateria(buscarMateria(datos.getMateria() != null ? datos.getMateria().getId() : null));
         return tutorRepository.save(tutor);
     }

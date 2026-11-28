@@ -1,6 +1,8 @@
 package com.SkillUp.Backend.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.SkillUp.Backend.util.FotoUtils;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
@@ -33,7 +35,14 @@ public class  Tutor {
 
     private String modalidad = "VIRTUAL";
 
-    private String foto;
+    @JsonIgnore
+    @Lob
+    @Column(name = "foto", columnDefinition = "MEDIUMBLOB")
+    private byte[] fotoBytes;
+
+    @JsonIgnore
+    @Column(name = "foto_tipo", length = 50)
+    private String fotoTipo;
 
 
     public Tutor() {
@@ -47,7 +56,7 @@ public class  Tutor {
         this.precio = precio;
         this.experiencia = experiencia;
         this.modalidad = modalidad != null ? modalidad : "VIRTUAL";
-        this.foto = foto;
+        setFoto(foto);
     }
 
     public Long getId() { return id; }
@@ -71,6 +80,10 @@ public class  Tutor {
     public String getModalidad() { return modalidad; }
     public void setModalidad(String modalidad) { this.modalidad = modalidad; }
 
-    public String getFoto() { return foto; }
-    public void setFoto(String foto) { this.foto = foto; }
+    public String getFoto() { return FotoUtils.aDataUrl(fotoBytes, fotoTipo); }
+    public void setFoto(String dataUrl) {
+        FotoUtils.Foto foto = FotoUtils.desdeDataUrl(dataUrl);
+        this.fotoBytes = foto == null ? null : foto.bytes();
+        this.fotoTipo = foto == null ? null : foto.contentType();
+    }
 }

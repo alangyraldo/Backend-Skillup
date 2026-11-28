@@ -10,6 +10,7 @@ public record UsuarioResponse(
         String email,
         TipoUsuario tipoUsuario,
         String telefono,
+        String foto,
         String token
 ) {
     public static UsuarioResponse desde(Usuario u) {
@@ -24,6 +25,7 @@ public record UsuarioResponse(
                 u.getEmail(),
                 u.getTipoUsuario(),
                 u.getTelefono(),
+                u.getFoto(),
                 token
         );
     }

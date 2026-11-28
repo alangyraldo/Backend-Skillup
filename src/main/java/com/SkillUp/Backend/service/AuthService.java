@@ -31,6 +31,7 @@ public class AuthService {
         usuario.setEmail(request.email());
         usuario.setTipoUsuario(request.tipoUsuario());
         usuario.setTelefono(request.telefono());
+        usuario.setFoto(request.foto());
         usuario.setContrasena(passwordEncoder.encode(request.contrasena()));
 
         return UsuarioResponse.desde(usuarioRepository.save(usuario));

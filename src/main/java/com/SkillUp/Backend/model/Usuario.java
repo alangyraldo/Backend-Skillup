@@ -1,6 +1,8 @@
 package com.SkillUp.Backend.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.SkillUp.Backend.util.FotoUtils;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,6 +38,26 @@ public class Usuario {
 
     @Column(length = 20)
     private String telefono;
+
+    @JsonIgnore
+    @Lob
+    @Column(name = "foto", columnDefinition = "MEDIUMBLOB")
+    private byte[] fotoBytes;
+
+    @JsonIgnore
+    @Column(name = "foto_tipo", length = 50)
+    private String fotoTipo;
+
+    /** Mantiene el contrato JSON actual del frontend; la BD almacena bytes BLOB. */
+    public String getFoto() {
+        return FotoUtils.aDataUrl(fotoBytes, fotoTipo);
+    }
+
+    public void setFoto(String dataUrl) {
+        FotoUtils.Foto foto = FotoUtils.desdeDataUrl(dataUrl);
+        this.fotoBytes = foto == null ? null : foto.bytes();
+        this.fotoTipo = foto == null ? null : foto.contentType();
+    }
 
     // La asigna MySQL (DEFAULT CURRENT_TIMESTAMP)
     @Column(name = "fecha_registro", insertable = false, updatable = false)
